@@ -1,15 +1,17 @@
-class GrailsRenderJsonGrailsPlugin {
+class RenderJsonGrailsPlugin {
     // the plugin version
-    def version = "0.1"
+    def version = "0.1-SNAPSHOT"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.4 > *"
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
-        "grails-app/views/error.gsp"
+        "grails-app/views/error.gsp",
+        "grails-app/domain/**", // exclude test domain class
+        "grails-app/controllers/**" // exclude test controller
     ]
 
     // TODO Fill in these fields
-    def title = "Grails Render JSON Plugin" // Headline display name of the plugin
+    def title = "Render JSON Plugin" // Headline display name of the plugin
     def author = "Brian Koehmstedt"
     def authorEmail = "bkoehmstedt@berkeley.edu"
     def description = '''\
