@@ -7,3 +7,6 @@ target
 atlassian-ide-plugin.xml
 .classpath
 .project
+web-app/WEB-INF/tld
+*.zip
+*.sha1

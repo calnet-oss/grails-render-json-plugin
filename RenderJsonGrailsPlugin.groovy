@@ -1,15 +1,23 @@
-class GrailsRenderJsonGrailsPlugin {
+import edu.berkeley.render.json.JSONString
+import edu.berkeley.render.json.marshallers.DomainJsonMarshaller
+import edu.berkeley.render.json.marshallers.MapJsonMarshaller
+
+class RenderJsonGrailsPlugin {
+    def group = "edu.berkeley.calnet.plugins"
+
     // the plugin version
-    def version = "0.1"
+    def version = "0.1-SNAPSHOT"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.4 > *"
     // resources that are excluded from plugin packaging
     def pluginExcludes = [
-        "grails-app/views/error.gsp"
+        "grails-app/views/error.gsp",
+        "grails-app/domain/**", // exclude test domain class
+        "grails-app/controllers/**" // exclude test controller
     ]
 
     // TODO Fill in these fields
-    def title = "Grails Render JSON Plugin" // Headline display name of the plugin
+    def title = "Render JSON Plugin" // Headline display name of the plugin
     def author = "Brian Koehmstedt"
     def authorEmail = "bkoehmstedt@berkeley.edu"
     def description = '''\
@@ -41,7 +49,17 @@ Provides extensions to the standard JSON converter to add rendering features.
     }
 
     def doWithSpring = {
-        // TODO Implement runtime spring config (optional)
+        // Register a custom marshaller for JSONString instances
+        jsonStringMarshaller(JSONString.ToStringJsonMarshaller)
+
+        // Register a custom marshaller for Domain class instances that will
+        // marshal a domain instance as a Map, at which point the
+        // MapJsonMarshaller takes over.
+        domainMarshaller(DomainJsonMarshaller)
+
+        // Register a custom marshaller for Map instances that will exclude
+        // rendering entries with null values
+        mapMarshaller(MapJsonMarshaller)
     }
 
     def doWithDynamicMethods = { ctx ->
