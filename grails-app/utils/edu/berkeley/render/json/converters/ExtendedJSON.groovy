@@ -6,6 +6,7 @@ import groovy.transform.InheritConstructors
 import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException
 
 import javax.servlet.http.HttpServletResponse
+import java.nio.charset.Charset
 
 /**
  * This extends the standard JSON converter and adds a Content-Length header
@@ -36,17 +37,18 @@ public class ExtendedJSON extends JSON {
             StringWriter writer = new StringWriter(startingBufferSize)
             // render the json to the string buffer
             render(writer)
+            String responseString = writer.getBuffer()
             // set Content-Length header based on what's in the buffer
-            response.setContentLength(writer.getBuffer().length())
+            response.setContentLength(responseString.getBytes(Charset.forName("UTF-8")).length)
             // set Last-Modified header if it was specified
             if (lastModified != null)
                 response.setDateHeader("Last-Modified", lastModified)
             // call the prerender closure if it was specified
             if (prerenderClosure) {
-                prerenderClosure(writer.getBuffer())
+                prerenderClosure(responseString)
             }
             // render the response to the HttpServletResponse
-            response.getWriter().write(writer.getBuffer().toString())
+            response.getWriter().write(responseString)
         }
         catch (IOException e) {
             throw new ConverterException(e)
