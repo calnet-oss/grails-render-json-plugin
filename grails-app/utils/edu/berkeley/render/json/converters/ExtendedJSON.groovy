@@ -29,6 +29,14 @@ public class ExtendedJSON extends JSON {
      * org.codehaus.groovy.grails.plugins.converters.api.ConvertersControllersApi
      * void render(controller, Converter converter), which adds "render
      * converterObject" to controllers.
+     *
+     * When you do <code>(foo as ExtendedJSON).toString()</code>, this is
+     * equivalent to <code>new ExtendedJSON(foo).toString()</code>.
+     *
+     * When you do <code>render foo as ExtendedJSON</code> in a controller,
+     * this is equivalent to
+     * <code>ConvertersControllersApi.render(thisController, new ExtendedJSON(foo))</code>,
+     * which does <code>fooConverter.render(controller.response)</code>.
      */
     @Override
     public void render(HttpServletResponse response) throws ConverterException {
