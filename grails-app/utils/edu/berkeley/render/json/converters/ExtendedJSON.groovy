@@ -1,5 +1,6 @@
 package edu.berkeley.render.json.converters
 
+import edu.berkeley.util.domain.IncludesExcludesInterface
 import grails.converters.JSON
 import grails.util.GrailsWebUtil
 import groovy.transform.InheritConstructors
@@ -24,6 +25,59 @@ public class ExtendedJSON extends JSON {
     Closure prerenderClosure
     Long lastModified
 
+    List<String> getIncludes() {
+        return getIncludes(target.getClass())
+    }
+
+    List<String> getExcludes() {
+        return getExcludes(target.getClass())
+    }
+
+    protected List<String> getExcludeDefaults() {
+        return ["class", "excludes", "includes"]
+    }
+
+    @Override
+    public void setTarget(Object target) {
+        boolean targetAlreadySet = target
+        super.setTarget(target)
+        /**
+         * If the target is an instance of IncludesExcludesInterface (such
+         * as from the @ConverterConfig annotation), then we can use the
+         * getIncludes() and getExcludes() method to configure the
+         * converter's includes and excludes.
+         */
+        if (target instanceof IncludesExcludesInterface) {
+            // only reset excludes and includes if this is not the first call to setTarget()
+            if (targetAlreadySet) {
+                setExcludes(null)
+                setIncludes(null)
+            }
+            if (target.includes) {
+                if (!getIncludes()) {
+                    // no existing includes list -- use from target
+                    setIncludes(target.includes)
+                } else {
+                    // existing includes list -- add to it
+                    getIncludes().addAll(target.includes)
+                }
+            } else {
+                // By default exclude a few fields we know we usually don't want.
+                // If we ever need to override these defaults, the way to do it is probably add parameters to the ConverterConfig annotation, and methods to the interface to control the defaults.
+                List<String> excludeDefaults = getExcludeDefaults()
+                if (!getExcludes()) {
+                    // no existing excludes list
+                    setExcludes(excludeDefaults)
+                } else {
+                    // existing excludes list -- add to it
+                    getExcludes().addAll(excludeDefaults)
+                }
+                // add the target's excludes
+                getExcludes().addAll(target.excludes)
+            }
+        }
+    }
+
     /**
      * This is called from
      * org.codehaus.groovy.grails.plugins.converters.api.ConvertersControllersApi
@@ -37,6 +91,10 @@ public class ExtendedJSON extends JSON {
      * this is equivalent to
      * <code>ConvertersControllersApi.render(thisController, new ExtendedJSON(foo))</code>,
      * which does <code>fooConverter.render(controller.response)</code>.
+     *
+     * Use the @ConverterConfig annotation (from the grails-domain-util
+     * library) on the target object if you want to control which fields get
+     * marshalled.
      */
     @Override
     public void render(HttpServletResponse response) throws ConverterException {

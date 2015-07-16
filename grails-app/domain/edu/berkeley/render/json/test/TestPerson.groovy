@@ -1,11 +1,8 @@
 package edu.berkeley.render.json.test
 
-class TestPerson {
-    String uid
-    String emailAddress
-    Date dateOfBirth
-    Date timeCreated
-    Date timeUpdated
-    String firstName
-    String lastName
+import edu.berkeley.util.domain.transform.ConverterConfig
+
+// exclude the dummyField when marshalling to JSON
+@ConverterConfig(excludes = ["dummyField"])
+class TestPerson extends AbstractTestPerson {
 }
