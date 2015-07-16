@@ -1,4 +1,4 @@
-== Configuration ==
+## Configuration
 
 In `grails-app/conf/spring/resources.groovy`:
 ```
@@ -22,7 +22,7 @@ beans = {
 }
 ```
 
-== To Use ==
+## To Use
 
 Once configured, you use `ExtendedJSON` like you would use `JSON`.
 
@@ -38,7 +38,7 @@ You can also do this and it doesn't have to be in a controller:
 String marshalledJson = (domainObject as ExtendedJSON).toString()
 ```
 
-== Including/Excluding Domain Class Fields ==
+## Including/Excluding Domain Class Fields
 
 You can use the @ConverterConfig annotation on the domain class to tell the
 converter which domain class properties to marshal or not marshal.
