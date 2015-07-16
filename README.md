@@ -40,8 +40,8 @@ String marshalledJson = (domainObject as ExtendedJSON).toString()
 
 ## Including/Excluding Domain Class Fields
 
-You can use the @ConverterConfig annotation on the domain class to tell the
-converter which domain class properties to marshal or not marshal.
+You can use the `@ConverterConfig` annotation on the domain class to tell
+the converter which domain class properties to marshal or not marshal.
 
 See the `@ConverterConfig` section in the README.md at
 https://github.com/ucidentity/grails-domain-util.
