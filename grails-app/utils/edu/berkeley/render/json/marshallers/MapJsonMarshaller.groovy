@@ -24,10 +24,16 @@ class MapJsonMarshaller extends MapMarshaller {
         List<String> includes = (isExtendedJSON ? converter.getIncludes() : converter.getIncludes(clazz))
         IncludeExcludeSupport<String> includeExcludeSupport = new IncludeExcludeSupport<String>()
 
+        Map map = (Map)o
+        // if not already so, convert to a SortedMap so we render json map keys in the same order
+        if(!(map instanceof SortedMap)) {
+            map = new TreeMap(map)
+        }
+
         // remove entries with null values
         // also check includes/excludes
         super.marshalObject(
-                o.findAll {
+                map.findAll {
                     it.value != null && shouldInclude(includeExcludeSupport, includes, excludes, o, it.key)
                 },
                 converter

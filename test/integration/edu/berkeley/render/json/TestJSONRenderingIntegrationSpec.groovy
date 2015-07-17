@@ -37,7 +37,7 @@ class TestJSONRenderingIntegrationSpec extends IntegrationSpec {
         when:
             testController.render((person as ExtendedJSON).setLastModified(person.timeUpdated))
         then:
-            String expected = """{"timeUpdated":"2015-03-26T19:40:15Z","uid":"123"}"""
+            String expected = '''{"timeUpdated":"2015-03-26T19:40:15Z","uid":"123"}'''
             // verify we got expected json
             writer.toString() == expected
             // verify the Content-Length header was set correctly
@@ -62,7 +62,7 @@ class TestJSONRenderingIntegrationSpec extends IntegrationSpec {
             assert converter.excludes.contains("excludes")
             testController.render(converter)
         then:
-            String expected = """{"firstName":"Søren Berg","lastName":"Glasius","uid":"123"}"""
+            String expected = '''{"firstName":"Søren Berg","lastName":"Glasius","uid":"123"}'''
             // verify we got expected json
             writer.toString() == expected
             // verify the Content-Length header was set correctly
@@ -79,7 +79,7 @@ class TestJSONRenderingIntegrationSpec extends IntegrationSpec {
             ExtendedJSON converter = person as ExtendedJSON
             testController.render(converter)
         then:
-            String expected = """{"lastName":"Smith","uid":"123","firstName":"John"}"""
+            String expected = '''{"firstName":"John","lastName":"Smith","uid":"123"}'''
             // verify we got expected json
             writer.toString() == expected
     }
@@ -95,7 +95,7 @@ class TestJSONRenderingIntegrationSpec extends IntegrationSpec {
             ExtendedJSON converter = person as ExtendedJSON
             testController.render(converter)
         then:
-            String expected = """{"lastName":"Smith","uid":"123","dummyField":"excludeMe","firstName":"John"}"""
+            String expected = '''{"dummyField":"excludeMe","firstName":"John","lastName":"Smith","uid":"123"}'''
             // verify we got expected json
             writer.toString() == expected
 
@@ -112,7 +112,7 @@ class TestJSONRenderingIntegrationSpec extends IntegrationSpec {
             ExtendedJSON converter = person as ExtendedJSON
             testController.render(converter)
         then:
-            String expected = """{"lastName":"Smith","uid":"123","dummyField":"excludeMe","firstName":"John"}"""
+            String expected = '''{"dummyField":"excludeMe","firstName":"John","lastName":"Smith","uid":"123"}'''
             // verify we got expected json
             writer.toString() == expected
 
@@ -130,13 +130,13 @@ class TestJSONRenderingIntegrationSpec extends IntegrationSpec {
         when:
             ExtendedJSON converter = personExcludesDummy as ExtendedJSON
             // first verify the first-go-around works as expected
-            assert converter.toString() == """{"lastName":"Smith","uid":"123","firstName":"John"}"""
+            assert converter.toString() == '''{"firstName":"John","lastName":"Smith","uid":"123"}'''
             // now assign a new target object to the converter.
             converter.setTarget(personIncludesDummy)
 
         then:
             // since the new target didn't exclude dummyField, we should now see it in the json
-            converter.toString() == """{"firstName":"John2","dummyField":"excludeMe","uid":"124","lastName":"Smith2"}"""
+            converter.toString() == '''{"dummyField":"excludeMe","firstName":"John2","lastName":"Smith2","uid":"124"}'''
     }
 
     void "test rendering TestPerson object with excludes after calling setTarget"() {
@@ -153,13 +153,30 @@ class TestJSONRenderingIntegrationSpec extends IntegrationSpec {
         when:
             ExtendedJSON converter = personIncludesDummy as ExtendedJSON
             // first verify the first-go-around works as expected
-            assert converter.toString() == """{"firstName":"John2","dummyField":"excludeMe","uid":"124","lastName":"Smith2"}"""
+            assert converter.toString() == '''{"dummyField":"excludeMe","firstName":"John2","lastName":"Smith2","uid":"124"}'''
             // now assign a new target object to the converter.
             converter.setTarget(personExcludesDummy)
 
         then:
             // since the new target now excludes dummyField, we shouldn't see it in the json
-            converter.toString() == """{"lastName":"Smith","uid":"123","firstName":"John"}"""
+            converter.toString() == '''{"firstName":"John","lastName":"Smith","uid":"123"}'''
     }
 
+    void "test rendering unsorted maps"() {
+        given:
+            // make two maps that are the same except for the ordering of the entry set iteration
+            Map map1 = [a: null, b: "123", c: "456", d: "789", e: "abc", f: "def", g: "ghi", h: null] as LinkedHashMap
+            // reverse the LinkedHashMap entry order (LinkedHashMap order is order that entries were added)
+            Map map2 = [:] as LinkedHashMap
+            new ArrayList(map1.entrySet()).reverse().each { map2.put(it.key, it.value) }
+            String map1Json = (map1 as ExtendedJSON).toString()
+            String map2Json = (map2 as ExtendedJSON).toString()
+
+        expect:
+            // two maps should be ordered differently
+            map1.toString() != map2.toString()
+            // but the JSON should be the same
+            map1Json == map2Json
+
+    }
 }
