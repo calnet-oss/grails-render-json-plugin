@@ -1,25 +1,11 @@
 ## Configuration
 
-In `grails-app/conf/spring/resources.groovy`:
+In `grails-app/conf/BuildConfig.groovy`:
 ```
-import edu.berkeley.render.json.JSONString
-import edu.berkeley.render.json.marshallers.DomainJsonMarshaller
-import edu.berkeley.render.json.marshallers.MapJsonMarshaller
-
-beans = {
-    // Register a custom marshaller for JSONString instances
-    jsonStringMarshaller(JSONString.ToStringJsonMarshaller)
-
-    // Register a custom marshaller for Domain class instances that will
-    // marshal a domain instance as a Map, at which point the
-    // MapJsonMarshaller takes over.
-    domainMarshaller(DomainJsonMarshaller)
-
-    // Register a custom marshaller for Map instances that will exclude
-    // rendering entries with null values and pay attention to
-    // @ConverterConfig annotations on the domain class.
-    mapMarshaller(MapJsonMarshaller)
-}
+    plugins {
+        ...
+        compile "edu.berkeley.calnet.plugins:render-json:VERSION"
+    }
 ```
 
 ## To Use
@@ -45,3 +31,21 @@ the converter which domain class properties to marshal or not marshal.
 
 See the `@ConverterConfig` section in the README.md at
 https://github.com/ucidentity/grails-domain-util.
+
+## Additional Notes
+
+This plugin registers the following marshallers that the normal JSON
+converter may also utilize if marshalling a domain class or a map.
+
+* `JSONString.ToStringJsonMarshaller`
+  * Allow already-marshalled JSONStrings to be included in map values as-is.
+* `DomainJsonMarshaller`
+  * Marshall domain objects as a regular map (by using `MapJsonMarshaller`)
+* `MapJsonMarshaller`
+  * Marshalls regular maps
+    * This is where the main logic is that strips out null values and checks
+      for field inclusions or exclusions.
+
+See `RenderJsonGrailsPlugin` `doWithSpring` and `doWithApplicationContext`
+to see how this marshallers are automatically registered when the plugin is
+used.
