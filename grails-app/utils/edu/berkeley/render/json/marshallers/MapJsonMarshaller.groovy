@@ -2,12 +2,14 @@ package edu.berkeley.render.json.marshallers
 
 import edu.berkeley.render.json.converters.ExtendedJSON
 import grails.converters.JSON
+import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.support.IncludeExcludeSupport
 import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException
 import org.codehaus.groovy.grails.web.converters.marshaller.json.MapMarshaller
 
 import javax.annotation.PostConstruct
 
+@Log4j
 class MapJsonMarshaller extends MapMarshaller {
     @PostConstruct
     void registerMarshaller() {
@@ -24,9 +26,9 @@ class MapJsonMarshaller extends MapMarshaller {
         List<String> includes = (isExtendedJSON ? converter.getIncludes() : converter.getIncludes(clazz))
         IncludeExcludeSupport<String> includeExcludeSupport = new IncludeExcludeSupport<String>()
 
-        Map map = (Map)o
+        Map map = (Map) o
         // if not already so, convert to a SortedMap so we render json map keys in the same order
-        if(!(map instanceof SortedMap)) {
+        if (!(map instanceof SortedMap)) {
             map = new TreeMap(map)
         }
 
@@ -35,6 +37,7 @@ class MapJsonMarshaller extends MapMarshaller {
         super.marshalObject(
                 map.findAll {
                     it.value != null && shouldInclude(includeExcludeSupport, includes, excludes, o, it.key)
+                    log.trace("${it.key}: value=${it.value}, shouldInclude=${shouldInclude(includeExcludeSupport, includes, excludes, o, it.key)}")
                 },
                 converter
         )
