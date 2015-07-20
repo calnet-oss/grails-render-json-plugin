@@ -10,37 +10,38 @@ import org.codehaus.groovy.grails.web.converters.marshaller.json.MapMarshaller
 import javax.annotation.PostConstruct
 
 @Log4j
-class MapJsonMarshaller extends MapMarshaller {
+class MapJsonMarshaller extends MapMarshaller implements IncludesExcludesMarshaller {
     @PostConstruct
     void registerMarshaller() {
         JSON.registerObjectMarshaller(this);
     }
 
-    @Override
-    public void marshalObject(Object o, JSON converter) throws ConverterException {
-
-        boolean isExtendedJSON = converter instanceof ExtendedJSON
-
-        Class<?> clazz = o.getClass()
-        List<String> excludes = (isExtendedJSON ? converter.getExcludes() : converter.getExcludes(clazz))
-        List<String> includes = (isExtendedJSON ? converter.getIncludes() : converter.getIncludes(clazz))
-        IncludeExcludeSupport<String> includeExcludeSupport = new IncludeExcludeSupport<String>()
-
-        Map map = (Map) o
+    public void marshalObject(Object obj, JSON converter, List<String> includes, List<String> excludes) throws ConverterException {
+        Map map = (Map) obj
         // if not already so, convert to a SortedMap so we render json map keys in the same order
         if (!(map instanceof SortedMap)) {
             map = new TreeMap(map)
         }
 
+        IncludeExcludeSupport<String> includeExcludeSupport = new IncludeExcludeSupport<String>()
+
         // remove entries with null values
         // also check includes/excludes
-        super.marshalObject(
-                map.findAll {
-                    it.value != null && shouldInclude(includeExcludeSupport, includes, excludes, o, it.key)
-                    log.trace("${it.key}: value=${it.value}, shouldInclude=${shouldInclude(includeExcludeSupport, includes, excludes, o, it.key)}")
-                },
-                converter
-        )
+        def toMarshal = map.findAll {
+            log.trace("${it.key}: value=${it.value}, shouldInclude=${shouldInclude(includeExcludeSupport, includes, excludes, map, it.key)}")
+            it.value != null && shouldInclude(includeExcludeSupport, includes, excludes, map, it.key)
+        }
+        log.trace("Marshalling the following: $toMarshal")
+        super.marshalObject(toMarshal, converter)
+    }
+
+    @Override
+    public void marshalObject(Object obj, JSON converter) throws ConverterException {
+        boolean isExtendedJSON = converter instanceof ExtendedJSON
+        Class<?> clazz = obj.getClass()
+        List<String> includes = (isExtendedJSON ? converter.getIncludes() : converter.getIncludes(clazz))
+        List<String> excludes = (isExtendedJSON ? converter.getExcludes() : converter.getExcludes(clazz))
+        marshalObject(obj, converter, includes, excludes)
     }
 
     // from org.codehaus.groovy.grails.web.converters.marshaller.json.DomainClassMarshaller
