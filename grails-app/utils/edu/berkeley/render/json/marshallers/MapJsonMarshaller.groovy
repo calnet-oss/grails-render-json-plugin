@@ -1,6 +1,6 @@
 package edu.berkeley.render.json.marshallers
 
-import edu.berkeley.render.json.converters.ExtendedJSON
+import edu.berkeley.util.domain.IncludesExcludesInterface
 import grails.converters.JSON
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.support.IncludeExcludeSupport
@@ -18,7 +18,8 @@ class MapJsonMarshaller extends MapMarshaller implements IncludesExcludesMarshal
 
     public void marshalObject(Object obj, JSON converter, List<String> includes, List<String> excludes) throws ConverterException {
         Map map = (Map) obj
-        // if not already so, convert to a SortedMap so we render json map keys in the same order
+        // if not already so, convert to a SortedMap so we render json map
+        // keys in the same order
         if (!(map instanceof SortedMap)) {
             map = new TreeMap(map)
         }
@@ -37,11 +38,14 @@ class MapJsonMarshaller extends MapMarshaller implements IncludesExcludesMarshal
 
     @Override
     public void marshalObject(Object obj, JSON converter) throws ConverterException {
-        boolean isExtendedJSON = converter instanceof ExtendedJSON
-        Class<?> clazz = obj.getClass()
-        List<String> includes = (isExtendedJSON ? converter.getIncludes() : converter.getIncludes(clazz))
-        List<String> excludes = (isExtendedJSON ? converter.getExcludes() : converter.getExcludes(clazz))
-        marshalObject(obj, converter, includes, excludes)
+        // while typically it's the domain class that implements the
+        // IncludesExcludesInterface, the map itself may implement it
+        boolean isIncludesExcludes = (obj instanceof IncludesExcludesInterface)
+        if (isIncludesExcludes) {
+            marshalObject(obj, converter, obj.includes, obj.excludes)
+        } else {
+            marshalObject(obj, converter, null, null)
+        }
     }
 
     // from org.codehaus.groovy.grails.web.converters.marshaller.json.DomainClassMarshaller
