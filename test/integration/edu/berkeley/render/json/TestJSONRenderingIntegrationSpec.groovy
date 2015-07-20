@@ -4,6 +4,7 @@ import edu.berkeley.render.json.converters.ExtendedJSON
 import edu.berkeley.render.json.test.*
 import grails.test.spock.IntegrationSpec
 import org.springframework.beans.factory.annotation.Autowired
+import edu.berkeley.render.json.marshallers.MapJsonMarshaller
 
 import java.nio.charset.Charset
 
@@ -37,7 +38,7 @@ class TestJSONRenderingIntegrationSpec extends IntegrationSpec {
         when:
             testController.render((person as ExtendedJSON).setLastModified(person.timeUpdated))
         then:
-            String expected = """{"timeUpdated":"2015-03-26T19:40:15Z","uid":"123"}"""
+            String expected = '''{"timeUpdated":"2015-03-26T19:40:15Z","uid":"123"}'''
             // verify we got expected json
             writer.toString() == expected
             // verify the Content-Length header was set correctly
@@ -57,12 +58,11 @@ class TestJSONRenderingIntegrationSpec extends IntegrationSpec {
             assert person.excludes == ["dummyField"]
             ExtendedJSON converter = person as ExtendedJSON
             converter.setLastModified(person.timeUpdated)
-            assert converter.excludes.contains("dummyField")
-            assert converter.excludes.contains("includes")
-            assert converter.excludes.contains("excludes")
+            def marshaller = converter.lookupObjectMarshaller(person.properties)
+            assert marshaller instanceof MapJsonMarshaller
             testController.render(converter)
         then:
-            String expected = """{"firstName":"Søren Berg","lastName":"Glasius","uid":"123"}"""
+            String expected = '''{"firstName":"Søren Berg","lastName":"Glasius","uid":"123"}'''
             // verify we got expected json
             writer.toString() == expected
             // verify the Content-Length header was set correctly
@@ -79,7 +79,7 @@ class TestJSONRenderingIntegrationSpec extends IntegrationSpec {
             ExtendedJSON converter = person as ExtendedJSON
             testController.render(converter)
         then:
-            String expected = """{"lastName":"Smith","uid":"123","firstName":"John"}"""
+            String expected = '''{"firstName":"John","lastName":"Smith","uid":"123"}'''
             // verify we got expected json
             writer.toString() == expected
     }
@@ -95,7 +95,7 @@ class TestJSONRenderingIntegrationSpec extends IntegrationSpec {
             ExtendedJSON converter = person as ExtendedJSON
             testController.render(converter)
         then:
-            String expected = """{"lastName":"Smith","uid":"123","dummyField":"excludeMe","firstName":"John"}"""
+            String expected = '''{"dummyField":"excludeMe","firstName":"John","lastName":"Smith","uid":"123"}'''
             // verify we got expected json
             writer.toString() == expected
 
@@ -112,54 +112,27 @@ class TestJSONRenderingIntegrationSpec extends IntegrationSpec {
             ExtendedJSON converter = person as ExtendedJSON
             testController.render(converter)
         then:
-            String expected = """{"lastName":"Smith","uid":"123","dummyField":"excludeMe","firstName":"John"}"""
+            String expected = '''{"dummyField":"excludeMe","firstName":"John","lastName":"Smith","uid":"123"}'''
             // verify we got expected json
             writer.toString() == expected
 
     }
 
-    void "test rendering TestPerson object with no excludes or includes after calling setTarget"() {
-        /**
-         * We're testing the conversion works after calling setTarget on the converter with different objects
-         * with different field configs for the converter.
-         */
+    void "test rendering unsorted maps"() {
         given:
-            // first an object that is excluding dummyField
-            TestPerson personExcludesDummy = new TestPerson(uid: "123", firstName: "John", lastName: "Smith")
-            TestPersonEmptyAnnotation personIncludesDummy = new TestPersonEmptyAnnotation(uid: "124", firstName: "John2", lastName: "Smith2")
-        when:
-            ExtendedJSON converter = personExcludesDummy as ExtendedJSON
-            // first verify the first-go-around works as expected
-            assert converter.toString() == """{"lastName":"Smith","uid":"123","firstName":"John"}"""
-            // now assign a new target object to the converter.
-            converter.setTarget(personIncludesDummy)
+            // make two maps that are the same except for the ordering of the entry set iteration
+            Map map1 = [a: null, b: "123", c: "456", d: "789", e: "abc", f: "def", g: "ghi", h: null] as LinkedHashMap
+            // reverse the LinkedHashMap entry order (LinkedHashMap order is order that entries were added)
+            Map map2 = [:] as LinkedHashMap
+            new ArrayList(map1.entrySet()).reverse().each { map2.put(it.key, it.value) }
+            String map1Json = (map1 as ExtendedJSON).toString()
+            String map2Json = (map2 as ExtendedJSON).toString()
 
-        then:
-            // since the new target didn't exclude dummyField, we should now see it in the json
-            converter.toString() == """{"firstName":"John2","dummyField":"excludeMe","uid":"124","lastName":"Smith2"}"""
+        expect:
+            // two maps should be ordered differently
+            map1.toString() != map2.toString()
+            // but the JSON should be the same
+            map1Json == map2Json
+
     }
-
-    void "test rendering TestPerson object with excludes after calling setTarget"() {
-        /**
-         * We're testing the conversion works after calling setTarget on the converter with different objects
-         * with different field configs for the converter.
-         *
-         * We're reversing the order of the above test.  Now we do the one without exclusions first, then add the exclusion on the second try.
-         */
-        given:
-            // first an object that is excluding dummyField
-            TestPerson personExcludesDummy = new TestPerson(uid: "123", firstName: "John", lastName: "Smith")
-            TestPersonEmptyAnnotation personIncludesDummy = new TestPersonEmptyAnnotation(uid: "124", firstName: "John2", lastName: "Smith2")
-        when:
-            ExtendedJSON converter = personIncludesDummy as ExtendedJSON
-            // first verify the first-go-around works as expected
-            assert converter.toString() == """{"firstName":"John2","dummyField":"excludeMe","uid":"124","lastName":"Smith2"}"""
-            // now assign a new target object to the converter.
-            converter.setTarget(personExcludesDummy)
-
-        then:
-            // since the new target now excludes dummyField, we shouldn't see it in the json
-            converter.toString() == """{"lastName":"Smith","uid":"123","firstName":"John"}"""
-    }
-
 }
