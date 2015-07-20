@@ -4,6 +4,7 @@ import edu.berkeley.util.domain.IncludesExcludesInterface
 import grails.converters.JSON
 import grails.util.GrailsWebUtil
 import groovy.transform.InheritConstructors
+import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException
 
 import javax.servlet.http.HttpServletResponse
@@ -20,6 +21,7 @@ import java.nio.charset.Charset
  * render ((person as ExtendedJSON).prerender() {println("process here")})
  */
 @InheritConstructors
+@Log4j
 public class ExtendedJSON extends JSON {
     int startingBufferSize = 8192
     Closure prerenderClosure
@@ -47,13 +49,16 @@ public class ExtendedJSON extends JSON {
          * getIncludes() and getExcludes() method to configure the
          * converter's includes and excludes.
          */
+        log.trace("${target.getClass().name} instanceof IncludesExcludesInterface? : ${target instanceof IncludesExcludesInterface}")
         if (target instanceof IncludesExcludesInterface) {
             // only reset excludes and includes if this is not the first call to setTarget()
             if (targetAlreadySet) {
+                log.trace("clearing existing excludes and includes because setTarget() called twice")
                 setExcludes(null)
                 setIncludes(null)
             }
             if (target.includes) {
+                log.trace("target has includes: ${target.includes}")
                 if (!getIncludes()) {
                     // no existing includes list -- use from target
                     setIncludes(target.includes)
@@ -61,7 +66,9 @@ public class ExtendedJSON extends JSON {
                     // existing includes list -- add to it
                     getIncludes().addAll(target.includes)
                 }
+                log.trace("includes for converter for ${target.getClass().name}: ${getIncludes()}")
             } else {
+                log.trace("target may have excludes: ${target.excludes}")
                 // By default exclude a few fields we know we usually don't want.
                 // If we ever need to override these defaults, the way to do it is probably add parameters to the ConverterConfig annotation, and methods to the interface to control the defaults.
                 List<String> excludeDefaults = getExcludeDefaults()
@@ -74,6 +81,7 @@ public class ExtendedJSON extends JSON {
                 }
                 // add the target's excludes
                 getExcludes().addAll(target.excludes)
+                log.trace("excludes for converter for ${target.getClass().name}: ${getExcludes()}")
             }
         }
     }
