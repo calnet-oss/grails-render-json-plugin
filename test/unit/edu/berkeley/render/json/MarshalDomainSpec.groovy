@@ -7,9 +7,7 @@ import grails.test.mixin.TestMixin
 import grails.test.mixin.domain.DomainClassUnitTestMixin
 import grails.test.mixin.support.GrailsUnitTestMixin
 import grails.test.mixin.web.ControllerUnitTestMixin
-import grails.test.runtime.FreshRuntime
 
-@FreshRuntime
 @TestMixin([GrailsUnitTestMixin, ControllerUnitTestMixin, DomainClassUnitTestMixin])
 class MarshalDomainSpec {
     static doWithSpring = ExtendedJSON.doWithSpringRegisterMarshallersClosure
