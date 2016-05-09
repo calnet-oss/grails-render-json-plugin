@@ -8,6 +8,8 @@ import grails.util.GrailsWebUtil
 import groovy.transform.InheritConstructors
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException
+import org.codehaus.groovy.grails.web.json.JSONArray
+import org.codehaus.groovy.grails.web.json.JSONObject
 
 import javax.servlet.http.HttpServletResponse
 import java.nio.charset.Charset
@@ -110,5 +112,21 @@ public class ExtendedJSON extends JSON {
             // rendering entries with null values
             mapMarshaller(MapJsonMarshaller)
         }
+    }
+
+    JSONObject toJSONObject() {
+        return (JSONObject) parse(this.toString())
+    }
+
+    JSONArray toJSONArray() {
+        return (JSONArray) parse(this.toString())
+    }
+
+    Map toMap() {
+        return toJSONObject()
+    }
+
+    List toList() {
+        return toJSONArray()
     }
 }
