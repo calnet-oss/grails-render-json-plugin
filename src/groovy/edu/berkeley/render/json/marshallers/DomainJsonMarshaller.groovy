@@ -5,6 +5,7 @@ import grails.converters.JSON
 import groovy.util.logging.Log4j
 import org.codehaus.groovy.grails.commons.DomainClassArtefactHandler
 import org.codehaus.groovy.grails.commons.GrailsApplication
+import org.codehaus.groovy.grails.web.converters.ConverterUtil
 import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException
 import org.codehaus.groovy.grails.web.converters.marshaller.ObjectMarshaller
 import org.springframework.beans.factory.annotation.Autowired
@@ -23,8 +24,9 @@ class DomainJsonMarshaller implements ObjectMarshaller<JSON> {
 
     public boolean supports(Object object) {
         // support if it's a Domain object
-        def domain = grailsApplication != null ? grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, object.getClass().name) : null
-        log.trace("supports ${object.getClass().getName()} : ${domain != null}")
+        String name = ConverterUtil.trimProxySuffix(object.getClass().getName())
+        def domain = grailsApplication != null ? grailsApplication.getArtefact(DomainClassArtefactHandler.TYPE, name) : null
+        log.trace("when grailsApplication = $grailsApplication, supports ${object.getClass().getName()} : ${domain != null}")
         return domain != null
     }
 
