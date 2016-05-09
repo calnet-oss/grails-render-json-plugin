@@ -1,6 +1,4 @@
-import edu.berkeley.render.json.JSONString
-import edu.berkeley.render.json.marshallers.DomainJsonMarshaller
-import edu.berkeley.render.json.marshallers.MapJsonMarshaller
+import edu.berkeley.render.json.converters.ExtendedJSON
 import grails.util.GrailsUtil
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
@@ -11,7 +9,7 @@ class RenderJsonGrailsPlugin {
     def group = "edu.berkeley.calnet.plugins"
 
     // the plugin version
-    def version = "0.9-SNAPSHOT"
+    def version = "0.10-SNAPSHOT"
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.4 > *"
     // resources that are excluded from plugin packaging
@@ -54,19 +52,9 @@ Provides extensions to the standard JSON converter to add rendering features.
         // TODO Implement additions to web.xml (optional), this event occurs before
     }
 
-    def doWithSpring = {
-        // Register a custom marshaller for JSONString instances
-        jsonStringMarshaller(JSONString.ToStringJsonMarshaller)
-
-        // Register a custom marshaller for Domain class instances that will
-        // marshal a domain instance as a Map, at which point the
-        // MapJsonMarshaller takes over.
-        domainMarshaller(DomainJsonMarshaller)
-
-        // Register a custom marshaller for Map instances that will exclude
-        // rendering entries with null values
-        mapMarshaller(MapJsonMarshaller)
-    }
+    // we put the doWithSpring closure in ExtendedJSON so that we can 
+    // use it in unit tests as well
+    def doWithSpring = ExtendedJSON.doWithSpringRegisterMarshallersClosure
 
     def doWithDynamicMethods = { ctx ->
         // TODO Implement registering dynamic methods to classes (optional)
