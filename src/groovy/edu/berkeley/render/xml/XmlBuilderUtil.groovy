@@ -1,5 +1,6 @@
 package edu.berkeley.render.xml
 
+import groovy.util.slurpersupport.NodeChild
 import groovy.xml.MarkupBuilder
 
 class XmlBuilderUtil {
@@ -159,6 +160,119 @@ class XmlBuilderUtil {
             return mapToXmlString(onlyEntry.key, onlyEntry.value, listEntryNames)
         } else {
             throw new IllegalArgumentException("The passed in map has more than one entry so unable to automatically determine the root element name.  Use mapToXmlString(String rootElementName, Map map) instead.")
+        }
+    }
+
+    /**
+     * Convert an XML document from XmlSlurper to a Map (which could further
+     * converted into JSON).  Because XML inherently contains more data than
+     * just name/value pairs (i.e., attributes), this is a rather crude and
+     * simplistic approach.  Any attributes in XML tags are disregarded.
+     * <p/>
+     * The defaults are:
+     * <ul>
+     *     <li>Convert boolean strings into Boolean objects</li>
+     *     <li>Don't convert number strings into Number objects</li>
+     * </ul>
+     *
+     * @param node The node being converted.
+     *
+     * @return An Object that is either a Map, List or String.  The root XML
+     * node being passed in is typically representative of a map, so the the
+     * return value will typically be a Map.
+     */
+    static Object xmlSlurperToMap(NodeChild node) {
+        return xmlSlurperToMap(
+                node,
+                node,
+                true, // detect booleans by default
+                false // don't detect number strings by default
+        )
+    }
+
+    /**
+     * Convert an XML document from XmlSlurper to a Map (which could further
+     * converted into JSON).  Because XML inherently contains more data than
+     * just name/value pairs (i.e., attributes), this is a rather crude and
+     * simplistic approach.  Any attributes in XML tags are disregarded.
+     *
+     * @param root Because of a Groovy NodeChild.parent() bug, pass in the
+     *        root node that matches the initial node being converted.
+     * @param node The node being converted.
+     * @param detectBooleans Pass true to convert boolean strings into
+     *        Boolean objects in resulting map.
+     * @param detectNumbers Pass true to convert number strings into
+     *        Number objects in resulting map.
+     *
+     * @return An Object that is either a Map, List or String.  The root XML
+     * node being passed in is typically representative of a map, so the the
+     * return value will typically be a Map.
+     */
+    static Object xmlSlurperToMap(NodeChild root, NodeChild node, boolean detectBooleans, boolean detectNumbers) {
+        // Find how many unique child tag names there are so we can
+        // determine if we need to treat this node as a map, list or text
+        // node.
+        def childNodeNameMap = [:]
+        node.children().each { NodeChild child ->
+            childNodeNameMap[child.name()] = true
+        }
+
+        Object objectValue = null
+        if (childNodeNameMap.size() > 1) {
+            // there are multiple child tag names, so treat children as a map
+            def map = node.children().collectEntries() { NodeChild child ->
+                [child.name(), xmlSlurperToMap(root, child, detectBooleans, detectNumbers)]
+            }
+            // get rid of the map name if there's only one map entry
+            objectValue = map.size() == 1 ? map.values().first() : map
+        } else if (childNodeNameMap.size() == 1 && node.children().size() >= 1) {
+            // there is only one unique child tag name, so treat children as
+            // a map
+            objectValue = node.children().collect { NodeChild child ->
+                xmlSlurperToMap(root, child, detectBooleans, detectNumbers)
+            }
+        } else {
+            // not a map nor a list -- must be a text node
+            String text = node.localText()?.join()?.trim()
+            if (detectBooleans && text?.toLowerCase() in ["true", "false"]) {
+                objectValue = Boolean.valueOf(text)
+            } else if (text) {
+                if (detectNumbers) {
+                    // number determination: not that efficient.  faster with a
+                    // regexp?
+                    try {
+                        Double dbl = Double.valueOf(text)
+                        // Didn't throw an exception, so it's at least a double.
+                        // Can we treat it as a long integer?
+                        if (dbl.doubleValue() == dbl.longValue()) {
+                            // yes, it's an integer
+                            objectValue = dbl.longValue()
+                        } else {
+                            // not an integer
+                            objectValue = dbl
+                        }
+                    }
+                    catch (ignored) {
+                        // not a number
+                        objectValue = text.toString()
+                    }
+                } else {
+                    // no number detection
+                    objectValue = text.toString()
+                }
+            } else {
+                objectValue = ""
+            }
+        }
+
+        // For the root, we want to add the root node in the map.  In Groovy
+        // used with Grails 2.5.4, NodeChild.parent() seems buggy.  That is
+        // why we are passing in the root node as a parameter rather than
+        // using parent().
+        if (node == root && node.name()) {
+            return [(node.name().toString()): objectValue] as Map
+        } else {
+            return objectValue
         }
     }
 }
