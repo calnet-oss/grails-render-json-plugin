@@ -38,9 +38,9 @@ class DomainJsonMarshaller implements ObjectMarshaller<JSON> {
         log.trace("marshaller for ${o.getClass().name}: ${marshaller.getClass().name}")
         if (marshaller instanceof IncludesExcludesMarshaller) {
             boolean isIncludesExcludes = (o instanceof IncludesExcludesInterface)
-            List<String> includes = (isIncludesExcludes && o.includes ? o.includes : null)
+            List<String> includes = (isIncludesExcludes && o.getIncludes() ? o.getIncludes() : null)
             // make a copy of excludes list since we modify it
-            List<String> excludes = (isIncludesExcludes && o.excludes ? new ArrayList(o.excludes) : null)
+            List<String> excludes = (isIncludesExcludes && o.getExcludes() ? new ArrayList(o.getExcludes()) : null)
 
             if (isIncludesExcludes) {
                 if (!includes) {
@@ -58,14 +58,14 @@ class DomainJsonMarshaller implements ObjectMarshaller<JSON> {
                     log.trace("excludes for converter for ${o.getClass().name}: ${excludes}")
                 }
             }
-            log.trace("passing to IncludesExcludesMarshaller: includes=$includes, excludes=$excludes for ${o.getClass().name}, isIncludesExcludes=$isIncludesExcludes")
-            marshaller.marshalObject(o.properties, converter, includes, excludes)
+            log.trace("passing to IncludesExcludesMarshaller: includes=$includes, excludes=$excludes for ${o.getClass().name}, isIncludesExcludes=$isIncludesExcludes, includeNulls=${o.getIncludeNulls()}")
+            marshaller.marshalObject(o.properties, converter, includes, excludes, (isIncludesExcludes ? o.getIncludeNulls() : false))
         } else {
             marshaller.marshalObject(o.properties, converter)
         }
     }
 
     protected List<String> getExcludeDefaults() {
-        return ["class", "excludes", "includes"]
+        return ["class", "excludes", "includes", "includeNulls"]
     }
 }
