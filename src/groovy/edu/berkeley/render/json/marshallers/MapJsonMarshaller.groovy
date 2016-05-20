@@ -16,7 +16,7 @@ class MapJsonMarshaller extends MapMarshaller implements IncludesExcludesMarshal
         JSON.registerObjectMarshaller(this);
     }
 
-    public void marshalObject(Object obj, JSON converter, List<String> includes, List<String> excludes, Boolean includeNulls) throws ConverterException {
+    public void marshalObject(Object obj, JSON converter, List<String> includes, List<String> excludes) throws ConverterException {
         Map map = (Map) obj
         // if not already so, convert to a SortedMap so we render json map
         // keys in the same order
@@ -29,8 +29,8 @@ class MapJsonMarshaller extends MapMarshaller implements IncludesExcludesMarshal
         // remove entries with null values
         // also check includes/excludes
         def toMarshal = map.findAll {
-            log.trace("${it.key}: value=${it.value}, includeNulls=$includeNulls, shouldInclude=${shouldInclude(includeExcludeSupport, includes, excludes, map, it.key)}")
-            (includeNulls || it.value != null) && shouldInclude(includeExcludeSupport, includes, excludes, map, it.key)
+            log.trace("${it.key}: value=${it.value}, shouldInclude=${shouldInclude(includeExcludeSupport, includes, excludes, map, it.key)}")
+            it.value != null && shouldInclude(includeExcludeSupport, includes, excludes, map, it.key)
         }
         log.trace("Marshalling the following: $toMarshal")
         super.marshalObject(toMarshal, converter)
@@ -42,9 +42,9 @@ class MapJsonMarshaller extends MapMarshaller implements IncludesExcludesMarshal
         // IncludesExcludesInterface, the map itself may implement it
         boolean isIncludesExcludes = (obj instanceof IncludesExcludesInterface)
         if (isIncludesExcludes) {
-            marshalObject(obj, converter, obj.getIncludes(), obj.getExcludes(), obj.getIncludeNulls())
+            marshalObject(obj, converter, obj.includes, obj.excludes)
         } else {
-            marshalObject(obj, converter, null, null, false)
+            marshalObject(obj, converter, null, null)
         }
     }
 

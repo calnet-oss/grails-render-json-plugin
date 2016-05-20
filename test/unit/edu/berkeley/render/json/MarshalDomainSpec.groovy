@@ -36,17 +36,5 @@ class MarshalDomainSpec {
         expect:
         json.helloMap?.helloArray instanceof JSONArray
         json.helloMap?.helloArray == ["world1", "world2"]
-        !json.containsKey("shouldBeNull")
-    }
-
-    void "test toJSONObject, including nulls"() {
-        given:
-        TestDomainIncludeNulls testDomain = new TestDomainIncludeNulls()
-        JSONObject json = (testDomain as ExtendedJSON).toJSONObject()
-
-        expect:
-        json.helloMap?.helloArray instanceof JSONArray
-        json.helloMap?.helloArray == ["world1", "world2"]
-        json.containsKey("shouldBeNull") && json.shouldBeNull == null
     }
 }
