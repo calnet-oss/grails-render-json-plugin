@@ -135,21 +135,4 @@ class TestJSONRenderingIntegrationSpec extends IntegrationSpec {
             map1Json == map2Json
 
     }
-
-    void "test rendering TestPerson object with nulls included"() {
-        /**
-         * We're testing that nulls are included when @ConverterConfig includeNulls=true is used.
-         */
-        given:
-        TestPersonIncludesNulls person = new TestPersonIncludesNulls(uid: "123", firstName: "John", lastName: "Smith")
-
-        when:
-        ExtendedJSON converter = person as ExtendedJSON
-        testController.render(converter)
-
-        then:
-        String expected = '''{"dateOfBirth":null,"emailAddress":null,"firstName":"John","lastName":"Smith","timeCreated":null,"timeUpdated":null,"uid":"123"}'''
-        // verify we got expected json
-        writer.toString() == expected
-    }
 }
