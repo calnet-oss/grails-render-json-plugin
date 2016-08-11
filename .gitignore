@@ -10,3 +10,5 @@ atlassian-ide-plugin.xml
 web-app/WEB-INF/tld
 *.zip
 *.sha1
+.gradle
+build

@@ -6,10 +6,10 @@ import org.apache.commons.logging.LogFactory
 class RenderJsonGrailsPlugin {
     public final Log LOG = LogFactory.getLog("edu.berkeley.render.json.RenderJsonGrailsPlugin")
 
-    def group = "edu.berkeley.calnet.plugins"
+    def group = "edu.berkeley.calnet.grails.plugins"
 
     // the plugin version
-    def version = "0.13.3-SNAPSHOT"
+    def version = "0.14-SNAPSHOT" // !!! Change in build.gradle too
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.4 > *"
     // resources that are excluded from plugin packaging
