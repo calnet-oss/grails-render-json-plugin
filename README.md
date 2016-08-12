@@ -4,7 +4,7 @@ In `grails-app/conf/BuildConfig.groovy`:
 ```
     plugins {
         ...
-        compile "edu.berkeley.calnet.plugins:render-json:VERSION"
+        compile "edu.berkeley.calnet.grails.plugins:render-json:VERSION"
     }
 ```
 
