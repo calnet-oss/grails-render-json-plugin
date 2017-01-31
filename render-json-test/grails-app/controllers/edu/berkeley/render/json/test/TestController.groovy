@@ -24,49 +24,36 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-//
-// This is a Gradle multi-project build.
-// See settings.gradle for the subprojects.
-//
-// The two subprojects are:
-// render-json-plugin - The main plugin that is packaged as a jar.
-// render-json-test - Tests using the plugin.
-//
-// We do it this way because it's difficult to have AST transformers and
-// integration tests in the same project.
-//
-// Gradle Multi-Project documentation is here:
-// https://docs.gradle.org/current/userguide/multi_project_builds.html
-//
 
+package edu.berkeley.render.json.test
 
-allprojects {
-    apply plugin: 'groovy'
+import edu.berkeley.render.json.converters.ExtendedJSON
 
-    group = 'edu.berkeley.calnet.grails.plugins'
-    version = '1.1.0-SNAPSHOT' 
+class TestController {
+    def renderTestPerson(String uid, String firstName, String lastName, Long timeUpdated) {
+        TestPerson person = new TestPerson(uid: uid, firstName: firstName, lastName: lastName, timeUpdated: timeUpdated ? new Date(timeUpdated) : null)
 
-    targetCompatibility = 1.8
-    sourceCompatibility = 1.8
-
-    repositories {
-        mavenLocal()
-        // If using a Maven proxy, put the property settings in
-        // ~/.gradle/gradle.properties for default_proxy_url,
-        // default_proxy_username and default_proxy_password.
-        if (project.hasProperty("default_proxy_url")) {
-            maven {
-                url project.property("default_proxy_url")
-                credentials {
-                    username project.property("default_proxy_username")
-                    password project.property("default_proxy_password")
-                }
-            }
-        }
-        jcenter()
-        mavenCentral()
+        render((person as ExtendedJSON).setLastModified(person.timeUpdated))
     }
-    dependencies {
-        compile "org.codehaus.groovy:groovy-all:2.4.7"
+
+    def renderTestPersonIncludesAnnotation() {
+        TestPersonIncludesAnnotation person = new TestPersonIncludesAnnotation(uid: "123", firstName: "John", lastName: "Smith")
+
+        render(person as ExtendedJSON)
+    }
+
+    def renderTestPersonNoAnnotation() {
+        TestPersonNoAnnotation person = new TestPersonNoAnnotation(uid: "123", firstName: "John", lastName: "Smith")
+        render(person as ExtendedJSON)
+    }
+
+    def renderTestPersonEmptyAnnotation() {
+        TestPersonEmptyAnnotation person = new TestPersonEmptyAnnotation(uid: "123", firstName: "John", lastName: "Smith")
+        render(person as ExtendedJSON)
+    }
+
+    def renderTestPersonIncludesNulls() {
+        TestPersonIncludesNulls person = new TestPersonIncludesNulls(uid: "123", firstName: "John", lastName: "Smith")
+        render(person as ExtendedJSON)
     }
 }

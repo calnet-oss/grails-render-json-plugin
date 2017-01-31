@@ -24,49 +24,42 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-//
-// This is a Gradle multi-project build.
-// See settings.gradle for the subprojects.
-//
-// The two subprojects are:
-// render-json-plugin - The main plugin that is packaged as a jar.
-// render-json-test - Tests using the plugin.
-//
-// We do it this way because it's difficult to have AST transformers and
-// integration tests in the same project.
-//
-// Gradle Multi-Project documentation is here:
-// https://docs.gradle.org/current/userguide/multi_project_builds.html
-//
 
+package edu.berkeley.render.json
 
-allprojects {
-    apply plugin: 'groovy'
+import grails.converters.JSON
+import grails.test.mixin.integration.Integration
+import groovy.json.JsonBuilder
+import spock.lang.Specification
 
-    group = 'edu.berkeley.calnet.grails.plugins'
-    version = '1.1.0-SNAPSHOT' 
+@Integration
+class JSONStringIntegrationSpec extends Specification {
 
-    targetCompatibility = 1.8
-    sourceCompatibility = 1.8
+    void "test JSONString marshalling"() {
+        /**
+         * Use JsonBuilder.toString to build a JSON string.
+         * Then wrap that string with a JSONString instance.
+         * Then create an ArrayList containing that JSONString
+         * Then use JSON converter to convert that ArrayList to JSON.
+         *
+         * We are testing that the JSON converter leaves the JSONString alone
+         * and outputs it in its raw form (doesn't escape it).
+         *
+         * JSONString.ToStringJsonMarshaller is registered using Spring in
+         * resources.groovy
+         */
+        given:
+            // build an array with a JSONString in it
+            def jsonObj = [new JSONString(new JsonBuilder([hello: "world"]).toString())]
+            JSON jsonConverter = new JSON(jsonObj)
+            StringWriter writer = new StringWriter()
 
-    repositories {
-        mavenLocal()
-        // If using a Maven proxy, put the property settings in
-        // ~/.gradle/gradle.properties for default_proxy_url,
-        // default_proxy_username and default_proxy_password.
-        if (project.hasProperty("default_proxy_url")) {
-            maven {
-                url project.property("default_proxy_url")
-                credentials {
-                    username project.property("default_proxy_username")
-                    password project.property("default_proxy_password")
-                }
-            }
-        }
-        jcenter()
-        mavenCentral()
-    }
-    dependencies {
-        compile "org.codehaus.groovy:groovy-all:2.4.7"
+        when:
+            // convert the array and write it to a string buffer
+            jsonConverter.render(writer)
+
+        then:
+            // verify that the JSONString in the array is output in raw form
+            writer.toString() == """[{"hello":"world"}]"""
     }
 }

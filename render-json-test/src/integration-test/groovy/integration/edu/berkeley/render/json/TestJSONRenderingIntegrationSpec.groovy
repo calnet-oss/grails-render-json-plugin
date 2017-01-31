@@ -24,49 +24,32 @@
  * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
-//
-// This is a Gradle multi-project build.
-// See settings.gradle for the subprojects.
-//
-// The two subprojects are:
-// render-json-plugin - The main plugin that is packaged as a jar.
-// render-json-test - Tests using the plugin.
-//
-// We do it this way because it's difficult to have AST transformers and
-// integration tests in the same project.
-//
-// Gradle Multi-Project documentation is here:
-// https://docs.gradle.org/current/userguide/multi_project_builds.html
-//
 
+package edu.berkeley.render.json
 
-allprojects {
-    apply plugin: 'groovy'
+import edu.berkeley.render.json.converters.ExtendedJSON
+import grails.test.mixin.integration.Integration
+import spock.lang.Specification
 
-    group = 'edu.berkeley.calnet.grails.plugins'
-    version = '1.1.0-SNAPSHOT' 
+@Integration
+class TestJSONRenderingIntegrationSpec extends Specification {
 
-    targetCompatibility = 1.8
-    sourceCompatibility = 1.8
+    void "test rendering unsorted maps"() {
+        given:
+        // make two maps that are the same except for the ordering of the entry set iteration
+        Map map1 = [a: null, b: "123", c: "456", d: "789", e: "abc", f: "def", g: "ghi", h: null] as LinkedHashMap
+        // reverse the LinkedHashMap entry order (LinkedHashMap order is order that entries were added)
+        Map map2 = [:] as LinkedHashMap
+        new ArrayList(map1.entrySet()).reverse().each { map2.put(it.key, it.value) }
+        String map1Json = (map1 as ExtendedJSON).toString()
+        String map2Json = (map2 as ExtendedJSON).toString()
 
-    repositories {
-        mavenLocal()
-        // If using a Maven proxy, put the property settings in
-        // ~/.gradle/gradle.properties for default_proxy_url,
-        // default_proxy_username and default_proxy_password.
-        if (project.hasProperty("default_proxy_url")) {
-            maven {
-                url project.property("default_proxy_url")
-                credentials {
-                    username project.property("default_proxy_username")
-                    password project.property("default_proxy_password")
-                }
-            }
-        }
-        jcenter()
-        mavenCentral()
+        expect:
+        // two maps should be ordered differently
+        map1.toString() != map2.toString()
+        // but the JSON should be the same
+        map1Json == map2Json
+
     }
-    dependencies {
-        compile "org.codehaus.groovy:groovy-all:2.4.7"
-    }
+
 }
