@@ -179,4 +179,23 @@ class TestJSONRenderingIntegrationSpec extends IntegrationSpec {
         // verify we got expected json
         writer.toString() == expected
     }
+
+    static enum EnumKeys {
+        KEY1, KEY2, KEY3
+    }
+
+
+    void "test rendering map with non-string keys"() {
+        given:
+        Map map = [(EnumKeys.KEY1): "value1", (EnumKeys.KEY2): "value2", (EnumKeys.KEY3): "value3"]
+
+        when:
+        ExtendedJSON converter = map as ExtendedJSON
+        testController.render(converter)
+
+        then:
+        String expected = '''{"KEY1":"value1","KEY2":"value2","KEY3":"value3"}'''
+        // verify we got expected json
+        writer.toString() == expected
+    }
 }
