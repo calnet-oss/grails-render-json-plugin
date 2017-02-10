@@ -35,7 +35,7 @@ class RenderJsonGrailsPlugin {
     def group = "edu.berkeley.calnet.grails.plugins"
 
     // the plugin version
-    def version = "1.0.0-SNAPSHOT" // !!! Change in build.gradle too
+    def version = "1.0.1-SNAPSHOT" // !!! Change in build.gradle too
     // the version or versions of Grails the plugin is designed for
     def grailsVersion = "2.4 > *"
     // resources that are excluded from plugin packaging
@@ -66,7 +66,7 @@ Provides extensions to the standard JSON converter to add rendering features.
     def organization = [ name: "University of California, Berkeley", url: "http://www.berkeley.edu/" ]
 
     // Any additional developers beyond the author specified above.
-//    def developers = [ [ name: "Joe Bloggs", email: "joe@bloggs.net" ]]
+    def developers = [ [ name: "Søren Berg Glasius", email: "sbglasius@berkeley.edu" ]]
 
     // Location of the plugin's issue tracker.
     def issueManagement = [ system: "GitHub", url: "https://github.com/calnet-oss/grails-render-json-plugin/issues" ]
@@ -74,15 +74,9 @@ Provides extensions to the standard JSON converter to add rendering features.
     // Online location of the plugin's browseable source code.
     def scm = [ url: "https://github.com/calnet-oss/grails-render-json-plugin" ]
 
-    def doWithWebDescriptor = { xml ->
-    }
-
     // we put the doWithSpring closure in ExtendedJSON so that we can 
     // use it in unit tests as well
     def doWithSpring = ExtendedJSON.doWithSpringRegisterMarshallersClosure
-
-    def doWithDynamicMethods = { ctx ->
-    }
 
     def doWithApplicationContext = { ctx ->
         // we do this here to ensure registration happens after the Grails
@@ -91,14 +85,5 @@ Provides extensions to the standard JSON converter to add rendering features.
         ctx.getBean("jsonStringMarshaller").registerMarshaller()
         ctx.getBean("domainMarshaller").registerMarshaller()
         ctx.getBean("mapMarshaller").registerMarshaller()
-    }
-
-    def onChange = { event ->
-    }
-
-    def onConfigChange = { event ->
-    }
-
-    def onShutdown = { event ->
     }
 }
