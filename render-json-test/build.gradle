@@ -27,8 +27,7 @@ dependencies {
     compile "com.budjb:http-requests-grails"
     compile "com.budjb:http-requests-jersey1"
 
-    compile project(":render-json-plugin")
-
+    compile project("$renderJsonRef:render-json-plugin")
 }
 
 bootRun {
