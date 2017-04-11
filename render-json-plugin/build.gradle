@@ -12,7 +12,6 @@ dependencies {
     compileOnly "org.springframework.boot:spring-boot-starter-logging"
     compileOnly "org.springframework.boot:spring-boot-autoconfigure"
     compileOnly "org.grails:grails-core"
-    compileOnly "org.springframework.boot:spring-boot-starter-tomcat"
 
     compileOnly "org.grails:grails-dependencies"
     compileOnly "org.grails:grails-web-boot"

@@ -56,8 +56,8 @@ class MapJsonMarshaller extends MapMarshaller implements IncludesExcludesMarshal
         // remove entries with null values
         // also check includes/excludes
         def toMarshal = map.findAll {
-            log.trace("${it.key}: value=${it.value}, includeNulls=$includeNulls, shouldInclude=${shouldInclude(includeExcludeSupport, includes, excludes, map, it.key)}")
-            (includeNulls || it.value != null) && shouldInclude(includeExcludeSupport, includes, excludes, map, it.key)
+            log.trace("${it.key}: value=${it.value}, includeNulls=$includeNulls, shouldInclude=${shouldInclude(includeExcludeSupport, includes, excludes, map, it.key.toString())}")
+            (includeNulls || it.value != null) && shouldInclude(includeExcludeSupport, includes, excludes, map, it.key.toString())
         }
         log.trace("Marshalling the following: $toMarshal")
         super.marshalObject(toMarshal, converter)

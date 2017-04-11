@@ -59,6 +59,10 @@ class MarshalMapSpec extends Specification {
         }
     }
 
+    static enum EnumKeys {
+        KEY1, KEY2, KEY3
+    }
+
     void "test correct map marshaller registered in unit test"() {
         given:
         ExtendedJSON json = new ExtendedJSON()
@@ -86,5 +90,16 @@ class MarshalMapSpec extends Specification {
         expect:
         json.hello == "world"
         json.containsKey("nullKey") && json.nullKey == null
+    }
+
+    void "test map to json marshalling where keys are not strings"() {
+        given:
+        IncludeNullsMap map = [(EnumKeys.KEY1): "value1", (EnumKeys.KEY2): "value2", (EnumKeys.KEY3): "value3"]
+        JSONObject json = (map as ExtendedJSON).toJSONObject()
+
+        expect:
+        json.KEY1 == 'value1'
+        json.KEY2 == 'value2'
+        json.KEY3 == 'value3'
     }
 }
