@@ -1,1 +1,4 @@
+
 rootProject.name = 'render-json'
+
+include 'render-json-plugin', 'render-json-test'
