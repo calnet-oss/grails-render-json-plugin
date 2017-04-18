@@ -23,7 +23,7 @@ dependencies {
     compileOnly "org.grails:grails-plugin-converters"
     testCompile "org.grails:grails-plugin-testing"
 
-    compile 'edu.berkeley.calnet.grails.libs:domain-util:1.1.0-SNAPSHOT'
+    compile domainUtilDep
 }
 
 bootRun {
