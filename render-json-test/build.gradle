@@ -27,7 +27,7 @@ dependencies {
     compile "com.budjb:http-requests-grails"
     compile "com.budjb:http-requests-jersey1"
 
-    compile project(renderJsonDep)
+    compile pdep(rootProject.renderJsonDep)
 }
 
 bootRun {

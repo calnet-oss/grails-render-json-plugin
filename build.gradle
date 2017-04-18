@@ -95,3 +95,7 @@ allprojects {
     //    compileOnly "org.codehaus.groovy:groovy:2.4.7"
     //}
 }
+
+def pdep(String depstr) {
+    return (depstr.startsWith(":") ? project(depstr) : depstr)
+}

@@ -23,7 +23,7 @@ dependencies {
     compileOnly "org.grails:grails-plugin-converters"
     testCompile "org.grails:grails-plugin-testing"
 
-    compile domainUtilDep
+    compile pdep(rootProject.domainUtilDep)
 }
 
 bootRun {
