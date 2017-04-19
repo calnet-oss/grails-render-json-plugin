@@ -13,7 +13,7 @@ dependencyManagement {
 }
 
 dependencies {
-    provided 'javax.servlet:javax.servlet-api'
+    compileOnly 'javax.servlet:javax.servlet-api'
     compileOnly "org.springframework.boot:spring-boot-starter-logging"
     compileOnly "org.springframework.boot:spring-boot-autoconfigure"
     compileOnly "org.grails:grails-core"
