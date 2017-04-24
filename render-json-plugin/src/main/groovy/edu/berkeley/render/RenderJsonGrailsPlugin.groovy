@@ -6,7 +6,7 @@ import grails.util.GrailsUtil
 import groovy.util.logging.Slf4j
 
 @Slf4j
-class GrailsPlugin extends Plugin {
+class RenderJsonGrailsPlugin extends Plugin {
 
     def grailsVersion = "3.0.0 > *"
     def dependsOn = [converters: GrailsUtil.getGrailsVersion()]
