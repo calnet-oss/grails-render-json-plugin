@@ -93,6 +93,15 @@ class DomainJsonMarshaller implements ObjectMarshaller<JSON> {
     }
 
     protected List<String> getExcludeDefaults() {
-        return ["class", "excludes", "includes", "includeNulls", "logicalHashCodeExcludes", "logicalHashCodeIncludes", "logicalHashCodeProperties"]
+        return [
+            "class",
+            "excludes",
+            "includes",
+            "includeNulls",
+            "logicalHashCodeExcludes",
+            "logicalHashCodeIncludes",
+            "logicalHashCodeProperties",
+            "hashCodeChangeCallback"
+        ]
     }
 }
