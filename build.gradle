@@ -63,8 +63,8 @@ buildscript {
     }
 }
 
-group 'edu.berkeley.calnet.grails.plugins'
-version '1.1.4-SNAPSHOT'
+group projectGroup
+version projectVersion
 
 subprojects {
     version parent.version
