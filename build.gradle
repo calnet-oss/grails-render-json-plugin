@@ -66,11 +66,6 @@ buildscript {
 group projectGroup
 version projectVersion
 
-subprojects {
-    version parent.version
-    group parent.group
-}
-
 allprojects {
     apply plugin: 'idea'
 
