@@ -27,7 +27,9 @@ apply plugin:"org.grails.grails-web"
 
 dependencyManagement {
     imports {
-        mavenBom "org.grails:grails-bom:$grailsVersion"
+        classpath("org.grails:grails-gradle-plugin:$grailsVersion") {
+            exclude group: "xerces", module: "xercesImpl"
+        }
         mavenBom "com.budjb:http-requests:1.0.2"
     }
     applyMavenExclusions false
