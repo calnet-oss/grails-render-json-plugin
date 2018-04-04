@@ -27,7 +27,6 @@ apply plugin:"org.grails.grails-web"
 
 dependencyManagement {
     imports {
-        mavenBom "org.grails:grails-bom:$grailsVersion"
         mavenBom "com.budjb:http-requests:1.0.2"
     }
     applyMavenExclusions false
@@ -42,12 +41,14 @@ dependencies {
     compile "org.grails:grails-web-boot"
     compile "org.grails.plugins:cache"
     compile "org.grails.plugins:hibernate5"
-    compile "org.hibernate:hibernate-core:5.1.2.Final"
-    compile "org.hibernate:hibernate-ehcache:5.1.2.Final"
+    compile "org.hibernate:hibernate-core:5.1.5.Final"
+    compile "org.hibernate:hibernate-ehcache:5.1.5.Final"
 
     profile "org.grails.profiles:web"
     runtime "com.h2database:h2"
-    testCompile "org.grails:grails-plugin-testing"
+    runtime "org.apache.tomcat:tomcat-jdbc"
+    testCompile "org.grails:grails-gorm-testing-support"
+    testCompile "org.grails:grails-web-testing-support"
 
     compile "com.budjb:http-requests-grails"
     compile "com.budjb:http-requests-jersey1"

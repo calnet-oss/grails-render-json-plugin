@@ -30,7 +30,7 @@ package integration.edu.berkeley.render.json
 import com.budjb.httprequests.HttpClient
 import com.budjb.httprequests.HttpClientFactory
 import com.budjb.httprequests.HttpRequest
-import grails.test.mixin.integration.Integration
+import grails.testing.mixin.integration.Integration
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.ApplicationContext
 import org.springframework.http.HttpStatus

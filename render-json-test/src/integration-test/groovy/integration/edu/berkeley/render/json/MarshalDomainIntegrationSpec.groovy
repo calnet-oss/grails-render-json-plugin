@@ -25,25 +25,21 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package edu.berkeley.render.json
+package integration.edu.berkeley.render.json
 
+import edu.berkeley.render.json.JSONString
 import edu.berkeley.render.json.converters.ExtendedJSON
 import edu.berkeley.render.json.marshallers.DomainJsonMarshaller
 import edu.berkeley.render.json.marshallers.MapJsonMarshaller
-import grails.test.mixin.TestMixin
-import grails.test.mixin.domain.DomainClassUnitTestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
-import grails.test.mixin.web.ControllerUnitTestMixin
+import edu.berkeley.render.json.test.TestDomain
+import edu.berkeley.render.json.test.TestDomainIncludeNulls
+import grails.testing.mixin.integration.Integration
 import org.grails.web.json.JSONArray
 import org.grails.web.json.JSONObject
+import spock.lang.Specification
 
-@TestMixin([GrailsUnitTestMixin, ControllerUnitTestMixin, DomainClassUnitTestMixin])
-class MarshalDomainSpec {
-    static doWithSpring = ExtendedJSON.doWithSpringRegisterMarshallersClosure
-
-    void setup() {
-        mockDomains(TestDomain)
-    }
+@Integration
+class MarshalDomainIntegrationSpec extends Specification {
 
     void "test correct marshallers registered in unit test"() {
         given:

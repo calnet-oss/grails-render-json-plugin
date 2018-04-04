@@ -30,17 +30,13 @@ package edu.berkeley.render.json
 import edu.berkeley.render.json.converters.ExtendedJSON
 import edu.berkeley.render.json.marshallers.MapJsonMarshaller
 import edu.berkeley.util.domain.IncludesExcludesInterface
-import grails.test.mixin.TestMixin
-import grails.test.mixin.domain.DomainClassUnitTestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
-import grails.test.mixin.web.ControllerUnitTestMixin
+import grails.testing.gorm.DataTest
 import org.grails.web.json.JSONObject
 import spock.lang.Ignore
 import spock.lang.Specification
 
-@TestMixin([GrailsUnitTestMixin, ControllerUnitTestMixin, DomainClassUnitTestMixin])
-class MarshalMapSpec extends Specification {
-    static doWithSpring = ExtendedJSON.doWithSpringRegisterMarshallersClosure
+class MarshalMapSpec extends Specification implements DataTest {
+    Closure doWithSpring() { ExtendedJSON.doWithSpringRegisterMarshallersClosure }
 
     static class IncludeNullsMap<K, V> extends HashMap<K, V> implements IncludesExcludesInterface {
         @Override

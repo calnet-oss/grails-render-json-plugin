@@ -51,7 +51,6 @@ dependencies {
     compileOnly "org.grails:grails-plugin-services"
     compileOnly "org.grails:grails-plugin-domain-class"
     compileOnly "org.grails:grails-plugin-converters"
-    testCompile "org.grails:grails-plugin-testing"
 
     compile pdep(rootProject.domainUtilDep)
 }
