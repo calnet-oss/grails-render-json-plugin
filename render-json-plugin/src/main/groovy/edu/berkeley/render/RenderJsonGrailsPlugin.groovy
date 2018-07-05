@@ -8,7 +8,7 @@ import groovy.util.logging.Slf4j
 @Slf4j
 class RenderJsonGrailsPlugin extends Plugin {
 
-    def grailsVersion = "3.0.0 > *"
+    def grailsVersion = "3.3.6 > *"
     def dependsOn = [converters: GrailsUtil.getGrailsVersion()]
 
     def title = "Render JSON Plugin"

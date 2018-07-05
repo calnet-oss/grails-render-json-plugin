@@ -28,17 +28,14 @@
 package edu.berkeley.render.xml
 
 import edu.berkeley.render.json.converters.ExtendedJSON
-import grails.test.mixin.TestMixin
-import grails.test.mixin.domain.DomainClassUnitTestMixin
-import grails.test.mixin.support.GrailsUnitTestMixin
-import grails.test.mixin.web.ControllerUnitTestMixin
 import groovy.util.slurpersupport.NodeChild
 import spock.lang.Shared
 import spock.lang.Specification
 
-@TestMixin([GrailsUnitTestMixin, ControllerUnitTestMixin, DomainClassUnitTestMixin])
 class XmlBuilderUtilSpec extends Specification {
-    static doWithSpring = ExtendedJSON.doWithSpringRegisterMarshallersClosure
+    Closure doWithSpring() {
+        return ExtendedJSON.doWithSpringRegisterMarshallersClosure
+    }
 
     @Shared
     def map = [
