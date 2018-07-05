@@ -33,7 +33,9 @@ import spock.lang.Shared
 import spock.lang.Specification
 
 class XmlBuilderUtilSpec extends Specification {
-    static doWithSpring = ExtendedJSON.doWithSpringRegisterMarshallersClosure
+    Closure doWithSpring() {
+        return ExtendedJSON.doWithSpringRegisterMarshallersClosure
+    }
 
     @Shared
     def map = [
